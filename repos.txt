@@ -15,3 +15,4 @@ maven { url "https://maven.firstdark.dev/snapshots/" }
 maven { url 'https://repo.repsy.io/mvn/toma/public/' }
 maven { url 'https://api.repsy.io/mvn/toma/public/' }
 maven { url "https://mvn.devos.one/snapshots/" }
+maven { url "https://maven.tterrag.com/" }
