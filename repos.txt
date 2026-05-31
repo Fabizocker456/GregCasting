@@ -22,3 +22,4 @@ maven { url "https://maven.hexxy.media/" }
 maven { url "https://maven.ladysnake.org/releases/" }
 maven { url "https://maven.parchmentmc.org/" }
 maven { url "https://modmaven.dev/" }
+maven { url "https://maven.ryanliptak.com/" }
