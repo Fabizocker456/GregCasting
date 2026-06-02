@@ -1,0 +1,10 @@
+{
+  "block.gregcasting.gradient_pump": "Gradient Pump",
+  "block.gregcasting.machine_casing_media_proof": "Machine Casing Media Proof",
+  "material.gregcasting.fluix": "Fluix",
+  "material.gregcasting.silicon_tetrafluoride": "SIlicon Tetrafluoride",
+  "material.gregcasting.silicon_tetrafluoride_media": "Media-Silicon Tetrafluoride",
+  "material.gregcasting.silicon_tetrafluoride_media_plus": "Rich Media-Silicon Tetrafluoride",
+  "material.gregcasting.silicon_tetrafluoride_xmedia": "Xenomedia-Silicon Tetrafluoride",
+  "material.gregcasting.silicon_tetrafluoride_xmedia_minus": "Sparse Xenomedia-Silicon Tetrafluoride"
+}

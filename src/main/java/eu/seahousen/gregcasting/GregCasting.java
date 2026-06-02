@@ -1,19 +1,19 @@
 package eu.seahousen.gregcasting;
 
+import at.petrak.hexcasting.api.HexAPI;
+import at.petrak.hexcasting.common.lib.HexRegistries;
+import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.data.chemical.material.event.MaterialEvent;
+import com.gregtechceu.gtceu.api.data.chemical.material.event.PostMaterialEvent;
+import com.gregtechceu.gtceu.api.machine.MachineDefinition;
+import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
-import net.minecraftforge.api.distmarker.Dist;
+import eu.seahousen.gregcasting.datagen.GCDatagen;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -21,12 +21,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -36,22 +33,12 @@ public class GregCasting {
     public static final String MODID = "gregcasting";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+    static {
+        LOGGER.info("-- GREGCASTING: CLINIT --");
+    }
 
-    // Creates a new Block with the id "gregcasting:example_block", combining the namespace and path
-    //public static final RegistryObject<Block> EXAMPLE_BLOCK = BLOCKS.register("example_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
-    // Creates a new BlockItem with the id "gregcasting:example_block", combining the namespace and path
-    //public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ITEMS.register("example_block", () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties()));
-
-    // Creates a new food item with the id "gregcasting:example_id", nutrition 1 and saturation 2
-    //public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEat().nutrition(1).saturationMod(2f).build())));
-
-    // Creates a creative tab with the id "gregcasting:example_tab" for the example item, that is placed after the combat tab
-    //public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder().withTabsBefore(CreativeModeTabs.COMBAT).icon(() -> EXAMPLE_ITEM.get().getDefaultInstance()).displayItems((parameters, output) -> {
-        //output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
-    //}).build());
+    // Bite the bullet. Use a Registrate.
+    public static final GTRegistrate REGISTRATE = GTRegistrate.create(GregCasting.MODID);
 
     public GregCasting() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -59,17 +46,52 @@ public class GregCasting {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
-        BLOCKS.register(modEventBus);
-        ITEMS.register(modEventBus);
-        CREATIVE_MODE_TABS.register(modEventBus);
-
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(this::addCreative);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, GCConfig.SPEC);
+
+        modEventBus.addListener(this::materials);
+        modEventBus.addListener(this::afterMaterials);
+        modEventBus.addListener(this::register);
+        modEventBus.addListener(this::datagen);
+        modEventBus.addGenericListener(MachineDefinition.class, this::registerMachines);
+        GCBlocks.init();
+        GCItems.init();
+    }
+
+    public static ResourceLocation id(String name) { return ResourceLocation.fromNamespaceAndPath(MODID, name); }
+    public static ResourceLocation idGreg(String name) { return GTCEu.id(name); }
+    public static ResourceLocation idHex(String name) { return HexAPI.modLoc(name); }
+    public static ResourceLocation idMC(String name) { return ResourceLocation.fromNamespaceAndPath("minecraft", name); }
+
+    private void register(RegisterEvent re) {
+        ResourceKey<?> key = re.getRegistryKey();
+        LOGGER.info("-- REGISTER {} --", key);
+        if(HexRegistries.ACTION.equals(key)) {
+            GCActions.init(re);
+        }
+    }
+
+    private void materials(MaterialEvent me) {
+        GCMaterials.init();
+    }
+
+    private void afterMaterials(PostMaterialEvent pme) {
+        GCMaterials.fixExisting();
+    }
+
+    private void registerMachines(GTCEuAPI.RegisterEvent<ResourceLocation, MachineDefinition> re) {
+        LOGGER.info("-- GT REGISTER {} --", re);
+        GCMachines.init();
+    }
+
+    private void datagen(GatherDataEvent gde) {
+        LOGGER.info("-- DATAGEN --");
+        GCDatagen.main(gde);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
