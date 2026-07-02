@@ -86,10 +86,14 @@ repositories {
 
     // will not cause any issues. trust!
     mavenCentral()
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+
     maven { url "https://modmaven.dev/" }
     maven { url "https://maven.gegy.dev/releases/" }
     maven { url "https://maven.blamejared.com/" }
-    // maven { url "https://maven.latvian.dev/releases/" }
+    maven { url "https://maven.latvian.dev/releases/" }
     maven { url "https://jitpack.io/" }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://thedarkcolour.github.io/KotlinForForge/" }
@@ -116,7 +120,8 @@ repositories {
 }
 
 dependencies { DependencyHandler it ->
-    it.implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    var mcdep = minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    it.implementation mcdep
 
     assert gtceu_version.equals("local")
     String gtceu = "[nodep]com.gregtechceu.gtceu:gtceu-$minecraft_version:$gtceu_version"
