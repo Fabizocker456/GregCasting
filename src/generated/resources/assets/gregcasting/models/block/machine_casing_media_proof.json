@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "gregcasting:block/machine_casing_media_proof"
+  }
+}

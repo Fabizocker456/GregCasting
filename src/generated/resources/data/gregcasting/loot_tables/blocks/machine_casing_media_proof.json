@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "gregcasting:machine_casing_media_proof"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "gregcasting:blocks/machine_casing_media_proof"
+}
