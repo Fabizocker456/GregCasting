@@ -1,10 +1,15 @@
 {
-  "block.gregcasting.gradient_pump": "Gradient Pump",
-  "block.gregcasting.machine_casing_media_proof": "Machine Casing Media Proof",
+  "block.gregcasting.gradient_pump": "Ethereal Energy Gradient Pump",
+  "block.gregcasting.machine_casing_media_proof": "Media-Proof Machine Casing",
+  "item.gregcasting.media_pill": "Media Substitution Pill",
+  "item.gtceu.fine_glass_wire": "Glass Fiber",
+  "item.gtceu.glass_foil": "Glass Sheet",
   "material.gregcasting.fluix": "Fluix",
-  "material.gregcasting.silicon_tetrafluoride": "SIlicon Tetrafluoride",
+  "material.gregcasting.silicon_tetrafluoride": "Silicon Tetrafluoride",
   "material.gregcasting.silicon_tetrafluoride_media": "Media-Silicon Tetrafluoride",
   "material.gregcasting.silicon_tetrafluoride_media_plus": "Rich Media-Silicon Tetrafluoride",
-  "material.gregcasting.silicon_tetrafluoride_xmedia": "Xenomedia-Silicon Tetrafluoride",
-  "material.gregcasting.silicon_tetrafluoride_xmedia_minus": "Sparse Xenomedia-Silicon Tetrafluoride"
+  "material.gregcasting.silicon_tetrafluoride_xmedia": "Sparse Xenomedia-Silicon Tetrafluoride",
+  "material.gregcasting.silicon_tetrafluoride_xmedia_minus": "Xenomedia-Silicon Tetrafluoride",
+  "material.gregcasting.sodium_silicate": "Sodium Silicate",
+  "medical_condition.gregcasting.xmedia": "Xenomedia Exposure"
 }

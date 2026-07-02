@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class GCBlocks {
+    // I shall bite the bullet that is Registrate.
 
     public static BlockEntry<Block> MEDIA_CASING = GregCasting.REGISTRATE.block("machine_casing_media_proof", Block::new)
+            .lang("Media-Proof Machine Casing")
             .properties(p -> BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).sound(SoundType.DEEPSLATE))
             .simpleItem()
             .register();

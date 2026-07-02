@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "minecraft:glowstone_dust" },
-    { "item": "hexcasting:amethyst_dust" }
-  ],
-  "result": { "item": "hexcasting:default_colorizer", "count": 1 }
-}

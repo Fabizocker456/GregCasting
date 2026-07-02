@@ -1,4 +1,4 @@
-package eu.seahousen.gregcasting;
+package eu.seahousen.gregcasting.util;
 
 public class DebugUtil {
     public static void dumpCallstack() {

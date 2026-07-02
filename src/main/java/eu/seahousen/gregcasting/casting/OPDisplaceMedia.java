@@ -12,13 +12,12 @@ import at.petrak.hexcasting.api.casting.eval.vm.SpellContinuation;
 import at.petrak.hexcasting.api.casting.iota.Iota;
 import at.petrak.hexcasting.api.casting.mishaps.Mishap;
 import at.petrak.hexcasting.api.misc.MediaConstants;
-import at.petrak.hexcasting.common.lib.HexBlocks;
-import eu.seahousen.gregcasting.GregCasting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +62,7 @@ public class OPDisplaceMedia implements SpellAction {
             )
     );
 
-    static @Nullable DecayChain canDisplace(BlockState block) {
+    static @Nullable DecayChain getDecayChain(BlockState block) {
         for(DecayChain i : DECAY_CHAINS) {
             if(i.canDecay(block.getBlock())) return i;
         }
@@ -71,9 +70,7 @@ public class OPDisplaceMedia implements SpellAction {
     }
 
     @Override
-    public int getArgc() {
-        return 1;
-    }
+    public int getArgc() { return 1; }
 
     @Override
     public @NotNull Result execute(@NotNull List<? extends Iota> list, @NotNull CastingEnvironment castingEnvironment) throws Mishap {
@@ -120,10 +117,13 @@ public class OPDisplaceMedia implements SpellAction {
         public void cast(@NotNull CastingEnvironment castingEnvironment) {
             ServerLevel world = castingEnvironment.getWorld();
             BlockState state = world.getBlockState(this.where);
-            @Nullable DecayChain chain = canDisplace(state);
+            @Nullable DecayChain chain = getDecayChain(state);
 
             if(chain == null) {
-
+                BlockEntity be = world.getBlockEntity(this.where);
+                if(be instanceof IDisplaceable d) {
+                    d.displaceMedia();
+                }
             } else {
                 chain.op.accept(world, this.where);
                 world.setBlockAndUpdate(

@@ -8,13 +8,11 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
-import static eu.seahousen.gregcasting.GregCasting.REGISTRATE;
-
 @GTAddon
 public class GCAddon implements IGTAddon {
     @Override
     public GTRegistrate getRegistrate() {
-        return REGISTRATE;
+        return GregCasting.REGISTRATE;
     }
 
     @Override
