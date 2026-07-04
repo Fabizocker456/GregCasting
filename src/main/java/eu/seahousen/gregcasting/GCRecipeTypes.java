@@ -1,6 +1,5 @@
 package eu.seahousen.gregcasting;
 
-import brachy.modularui.drawable.GuiTextures;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
@@ -8,7 +7,6 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.data.GTSoundEntries;
 import com.gregtechceu.gtceu.common.mui.GTGuiTextures;
-import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import eu.seahousen.gregcasting.recipecondition.MediaDisplacedCondition;
 
 public class GCRecipeTypes {
