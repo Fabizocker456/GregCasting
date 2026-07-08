@@ -29,8 +29,8 @@ public class GCMedicalConditions {
             UUID.fromString("46f3a295-f78c-41d9-b825-81f08d732af6")
     );
 
-    public static Symptom MORE_MEDIA = Symptom.ofAttributeModifier(
-            "more_media",
+    public static Symptom MORE_EXPENSIVE = Symptom.ofAttributeModifier(
+            "more_expensive_casting",
             6,
             0.0F,
             1.0F,
@@ -58,7 +58,7 @@ public class GCMedicalConditions {
             false,
             new Symptom.ConfiguredSymptom(SMALLER_GRID, 5, 50, 300),
             new Symptom.ConfiguredSymptom(SMALLER_AMBIT, 5, 100, 300),
-            new Symptom.ConfiguredSymptom(MORE_MEDIA, 6, 150, 300),
+            new Symptom.ConfiguredSymptom(MORE_EXPENSIVE, 6, 150, 300),
             new Symptom.ConfiguredSymptom(NO_MORE_GSENT_FOR_YOU, 1, 290, 300)
     );
 

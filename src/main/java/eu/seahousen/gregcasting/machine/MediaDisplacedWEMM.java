@@ -1,17 +1,12 @@
 package eu.seahousen.gregcasting.machine;
 
 import com.gregtechceu.gtceu.api.blockentity.BlockEntityCreationInfo;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.modifier.ModifierFunction;
-import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.sync_system.annotations.SaveField;
-import eu.seahousen.gregcasting.GregCasting;
 import eu.seahousen.gregcasting.casting.IDisplaceable;
-import eu.seahousen.gregcasting.mixinutil.IGetDebugData;
+import eu.seahousen.gregcasting.nixim.IGetDebugData;
 
 public class MediaDisplacedWEMM extends WorkableElectricMultiblockMachine implements IDisplaceable, IGetDebugData {
     static final int LAST_TICK_MAX = 20 * 60 * 60 * 24; // should be enough...

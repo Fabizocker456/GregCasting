@@ -1,67 +1,95 @@
 package eu.seahousen.gregcasting;
 
+import appeng.api.util.AEColor;
+import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
+import appeng.core.definitions.AEParts;
+import at.petrak.hexcasting.api.mod.HexTags;
 import at.petrak.hexcasting.common.items.pigment.ItemPridePigment;
+import at.petrak.hexcasting.common.lib.HexBlocks;
 import at.petrak.hexcasting.common.lib.HexItems;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.common.cosmetics.GTCapes;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTRecipeCategories;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
+import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
 import eu.seahousen.gregcasting.recipecondition.MediaDisplacedCondition;
+import it.unimi.dsi.fastutil.Hash;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 
 import eu.seahousen.gregcasting.util.Suppliers;
+import net.minecraft.world.item.Items;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.function.Consumer;
 
 public class GCRecipes {
-    static void initGreg(Consumer<FinishedRecipe> provider) {
-        final Material[] PRIDE_CHEMICALS = {
-                GTMaterials.Fluorine,
-                GTMaterials.HydrochloricAcid,
-                GTMaterials.BisphenolA,
-                GTMaterials.AminoPhenol,
-                GTMaterials.VinylAcetate,
-                GTMaterials.AmmoniumFormate,
-                GTMaterials.Chlorobenzene,
-                GTMaterials.Chloromethane,
-                GTMaterials.AquaRegia,
-                GTMaterials.Ammonia,
-                GTMaterials.UraniumHexafluoride,
-                GTMaterials.DiethylenetriaminePentaacetonitrile,
-                GTMaterials.DinitrogenTetroxide,
-                GTMaterials.GlycerylTrinitrate,
-                GTMaterials.NitrationMixture,
-                GTMaterials.Butyraldehyde
-        };
+    public static HashMap<ItemPridePigment.Type, ResourceLocation> PRIDE_CAPES = new HashMap<>(){{
+        put(ItemPridePigment.Type.GAY, GTCapes.RAINBOW_CAPE);
+        put(ItemPridePigment.Type.ASEXUAL, GTCapes.ACE_CAPE);
+        put(ItemPridePigment.Type.AGENDER, GTCapes.AGENDER_CAPE);
+        put(ItemPridePigment.Type.AROMANTIC, GTCapes.AROMANTIC_CAPE);
+        put(ItemPridePigment.Type.BISEXUAL, GTCapes.BI_CAPE);
+        put(ItemPridePigment.Type.GENDERFLUID, GTCapes.GENDERFLUID_CAPE);
+        put(ItemPridePigment.Type.GENDERQUEER, GTCapes.GENDERQUEER_CAPE);
+        put(ItemPridePigment.Type.INTERSEX, GTCapes.INTERSEX_CAPE);
+        put(ItemPridePigment.Type.LESBIAN, GTCapes.LESBIAN_CAPE);
+        put(ItemPridePigment.Type.NONBINARY, GTCapes.NONBINARY_CAPE);
+        put(ItemPridePigment.Type.PANSEXUAL, GTCapes.PAN_CAPE);
+        put(ItemPridePigment.Type.TRANSGENDER, GTCapes.TRANS_CAPE);
+    }};
 
-        long prideShuffleSeed = 24062026; // update occasionally
+    public static HashMap<DyeColor, ResourceLocation> COLOR_CAPES = new HashMap<>(){{
+        put(DyeColor.RED, GTCapes.RED_CAPE);
+        put(DyeColor.YELLOW, GTCapes.YELLOW_CAPE);
+        put(DyeColor.GREEN, GTCapes.GREEN_CAPE);
+    }};
+
+    public static Material[] PRIDE_CHEMICALS = {
+            GTMaterials.Fluorine,
+            GTMaterials.HydrochloricAcid,
+            GTMaterials.BisphenolA,
+            GTMaterials.AminoPhenol,
+            GTMaterials.VinylAcetate,
+            GTMaterials.AmmoniumFormate,
+            GTMaterials.Chlorobenzene,
+            GTMaterials.Chloromethane,
+            GTMaterials.AquaRegia,
+            GTMaterials.Ammonia,
+            GTMaterials.UraniumHexafluoride,
+            GTMaterials.DiethylenetriaminePentaacetonitrile,
+            GTMaterials.DinitrogenTetroxide,
+            GTMaterials.GlycerylTrinitrate,
+            GTMaterials.NitrationMixture,
+            GTMaterials.Butyraldehyde
+    };
+
+    static void initGreg(Consumer<FinishedRecipe> provider) {
+
+        long prideShuffleSeed = 20260807;
+        if(GregCasting.buildMetaParsed.keySet().contains("build-timestamp")) {
+            if(GregCasting.buildMetaParsed.get("build-timestamp") instanceof String s) {
+                prideShuffleSeed = s.hashCode();
+                GregCasting.LOGGER.info("found build timestamp! new seed {}", prideShuffleSeed);
+            }
+        }
         Random chemicalShuffleRandom = new Random(prideShuffleSeed);
         for(int i = PRIDE_CHEMICALS.length - 1; i > 0; i--) {
             int j = chemicalShuffleRandom.nextInt(i + 1);
             Material tmp = PRIDE_CHEMICALS[i];
             PRIDE_CHEMICALS[i] = PRIDE_CHEMICALS[j];
             PRIDE_CHEMICALS[j] = tmp;
-        }
-
-        for(DyeColor color : DyeColor.values()) {
-            String name = color.getName();
-            GTRecipeTypes.CHEMICAL_BATH_RECIPES.recipeBuilder("gregcasting:color_%s".formatted(name))
-                    .inputItems(new ItemStack(HexItems.DEFAULT_PIGMENT.asItem()))
-                    .inputFluids(GTMaterials.CHEMICAL_DYES[color.ordinal()].getFluid(GTValues.L))
-                    .outputItems(new ItemStack(HexItems.DYE_PIGMENTS.get(color).asItem()))
-                    .category(GTRecipeCategories.CHEM_DYES)
-                    .save(provider);
         }
 
         // This should not change.
@@ -76,10 +104,21 @@ public class GCRecipes {
             ItemPridePigment.Type type = types[i];
             Material mat = PRIDE_CHEMICALS[i];
             // noooo they're putting chemicals in the pigments to turn the wisps gay
-            GTRecipeTypes.CHEMICAL_BATH_RECIPES.recipeBuilder("gregcasting:pigment_%s_%s".formatted(mat.getName(), type.getName()))
+            GTRecipeBuilder rb = GTRecipeTypes.CHEMICAL_BATH_RECIPES.recipeBuilder("gregcasting:pigment_%s_%s".formatted(mat.getName(), type.getName()))
                     .inputItems(new ItemStack(HexItems.DEFAULT_PIGMENT.asItem()))
                     .inputFluids(mat.getFluid(500))
                     .outputItems(new ItemStack(HexItems.PRIDE_PIGMENTS.get(type)))
+                    .category(GTRecipeCategories.CHEM_DYES);
+
+            rb.save(provider);
+        }
+
+        for(DyeColor color : DyeColor.values()) {
+            String name = color.getName();
+            GTRecipeTypes.CHEMICAL_BATH_RECIPES.recipeBuilder("gregcasting:color_%s".formatted(name))
+                    .inputItems(new ItemStack(HexItems.DEFAULT_PIGMENT.asItem()))
+                    .inputFluids(GTMaterials.CHEMICAL_DYES[color.ordinal()].getFluid(GTValues.L))
+                    .outputItems(new ItemStack(HexItems.DYE_PIGMENTS.get(color).asItem()))
                     .category(GTRecipeCategories.CHEM_DYES)
                     .save(provider);
         }
@@ -100,7 +139,7 @@ public class GCRecipes {
 
         GTRecipeTypes.CANNER_RECIPES.recipeBuilder("gregcasting:color_base")
                 .inputItems(TagPrefix.dust, GTMaterials.Amethyst, 1)
-                .notConsumable(GTItems.SHAPE_MOLD_PILL)
+                .notConsumable(GTItems.SHAPE_MOLD_BALL)
                 .outputItems(() -> HexItems.DEFAULT_PIGMENT)
                 .save(provider);
 
@@ -187,12 +226,12 @@ public class GCRecipes {
                 'C', GCBlocks.MEDIA_CASING.get().asItem());
 
         GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder("gregcasting:mpc")
-                .inputItems(TagPrefix.foil, GTMaterials.Lead, 32)
+                .inputItems(TagPrefix.foil, GTMaterials.Glass, 32)
                 .inputFluids(GTMaterials.Polyethylene.getFluid(GTValues.L))
                 .outputItems(GCBlocks.MEDIA_CASING.get().asItem(), 2)
                 .save(provider);
 
-        GTRecipeTypes.CUTTER_RECIPES.recipeBuilder("gregcasting:ae2_sili_from_sili")
+        GTRecipeTypes.CUTTER_RECIPES.recipeBuilder("gregcasting:ae2_sili")
                 .inputItems(GTItems.SILICON_WAFER)
                 .outputItems(Suppliers.ae2(AEItems.SILICON), 4)
                 .save(provider);
@@ -221,19 +260,49 @@ public class GCRecipes {
                 .outputItems(Suppliers.ae2(AEItems.ENGINEERING_PROCESSOR))
                 .save(provider);
 
-        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:charger", GCMachines.GRADIENT_PUMP.asStack(),
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:charger", AEBlocks.CHARGER.stack(),
                 "ABA", "A  ", "ACA",
                 'A', new MaterialEntry(TagPrefix.ingot, GTMaterials.Iron),
                 'B', new MaterialEntry(TagPrefix.ingot, GTMaterials.Copper),
                 'C', GTItems.VOLTAGE_COIL_MV);
 
-        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:inscriber", GCMachines.GRADIENT_PUMP.asStack(),
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:inscriber", AEBlocks.INSCRIBER.stack(),
                 "AEA", "C A", "ADA",
                 'A', new MaterialEntry(TagPrefix.ingot, GTMaterials.Iron),
                 'C', new MaterialEntry(TagPrefix.ingot, GTMaterials.Copper),
                 'D', GTItems.ELECTRIC_PISTON_HV,
                 'E', GTItems.EMITTER_HV);
+
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:focus", new ItemStack(HexItems.FOCUS),
+                "ABA", "CZC", "ABA",
+                'A', Items.GLOWSTONE_DUST,
+                'B', Items.LEATHER,
+                'C', Items.PAPER,
+                'Z', AEItems.CELL_COMPONENT_1K.asItem());
+
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:focus_rotated", new ItemStack(HexItems.FOCUS),
+                "ACA", "BZB", "ACA",
+                'A', Items.GLOWSTONE_DUST,
+                'B', Items.LEATHER,
+                'C', Items.PAPER,
+                'Z', AEItems.CELL_COMPONENT_1K.asItem());
+
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:spellbook", new ItemStack(HexItems.SPELLBOOK),
+                "NBA", "NZA", "NBA",
+                'A', HexItems.CHARGED_AMETHYST,
+                'N', Items.GOLD_NUGGET,
+                'B', Items.WRITABLE_BOOK,
+                'Z', AEItems.CELL_COMPONENT_64K.asItem());
+
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "gregcasting:akashic_bookshelf", new ItemStack(HexBlocks.AKASHIC_BOOKSHELF.asItem()),
+                "LAL", "YBZ", "LAL",
+                'A', HexTags.Blocks.EDIFIED_PLANKS,
+                'L', HexTags.Blocks.EDIFIED_LOGS,
+                'B', Items.BOOK,
+                'Y', AEItems.CELL_COMPONENT_1K.asItem(),
+                'Z', AEParts.GLASS_CABLE.item(AEColor.TRANSPARENT));
     }
+
     static void deleteGreg(Consumer<ResourceLocation> consumer) {
         // no free media
         consumer.accept(GregCasting.idGreg("implosion_compressor/implode_dust_amethyst_tnt"));
@@ -254,6 +323,11 @@ public class GCRecipes {
         }
         consumer.accept(GregCasting.idHex("uuid_colorizer"));
         consumer.accept(GregCasting.idHex("ancient_colorizer"));
+
+        consumer.accept(GregCasting.idHex("focus"));
+        consumer.accept(GregCasting.idHex("focus_rotated"));
+        consumer.accept(GregCasting.idHex("spellbook"));
+        consumer.accept(GregCasting.idHex("akashic_bookshelf"));
 
         consumer.accept(GregCasting.idAE("inscriber/logic_processor"));
         consumer.accept(GregCasting.idAE("inscriber/calculation_processor"));

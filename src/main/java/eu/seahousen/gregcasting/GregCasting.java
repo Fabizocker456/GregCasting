@@ -3,6 +3,8 @@ package eu.seahousen.gregcasting;
 import appeng.core.AppEng;
 import at.petrak.hexcasting.api.HexAPI;
 import at.petrak.hexcasting.common.lib.HexRegistries;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.material.event.MaterialEvent;
@@ -18,8 +20,10 @@ import eu.seahousen.gregcasting.datagen.GCDatagen;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -29,12 +33,20 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 @Mod(GregCasting.MODID)
 public class GregCasting {
 
     public static final String MODID = "gregcasting";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static MinecraftServer server = null;
+    public static String buildMeta;
+    public static Map<?, ?> buildMetaParsed;
+
+    public static GregCasting INSTANCE;
 
     static {
         LOGGER.info("-- GREGCASTING: CLINIT --");
@@ -44,17 +56,31 @@ public class GregCasting {
     public static final GTRegistrate REGISTRATE = GTRegistrate.create(GregCasting.MODID);
 
     public GregCasting(FMLJavaModLoadingContext jmlc) {
-        IEventBus modEventBus = jmlc.getModEventBus();
+        INSTANCE = this;
 
-        // Register the commonSetup method for modloading
+        try {
+            buildMeta = new String(
+                    GregCasting.class.getClassLoader().getResourceAsStream("/build-meta.json").readAllBytes(),
+                    StandardCharsets.UTF_8
+            );
+            buildMetaParsed = new Gson().fromJson(buildMeta, Map.class);
+        } catch (IOException | NullPointerException e) {
+            buildMeta = null;
+            buildMetaParsed = Map.of();
+            LOGGER.error("Could not load build metadata: {}", e.toString());
+        } catch (JsonSyntaxException e) {
+            buildMeta = null;
+            buildMetaParsed = Map.of();
+            LOGGER.error("Could not parse build metadata JSON: {}", e.toString());
+        }
+
+        IEventBus modEventBus = jmlc.getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
-        // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(this::addCreative);
 
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         jmlc.registerConfig(ModConfig.Type.COMMON, GCConfig.SPEC);
 
         modEventBus.addListener(this::materials);
@@ -65,6 +91,7 @@ public class GregCasting {
         modEventBus.addGenericListener(GTRecipeType.class, this::registerRecipeTypes);
         modEventBus.addGenericListener(MedicalCondition.class, this::registerMedicalConditions);
         modEventBus.addGenericListener(RecipeConditionType.class, this::registerRecipeConditions);
+        modEventBus.addGenericListener(ItemStack.class, this::registerItemStackCapabilities);
         GCBlocks.init();
         GCItems.init();
         REGISTRATE.addDataGenerator(ProviderType.LANG, GCLanguage::init);
@@ -116,6 +143,10 @@ public class GregCasting {
     private void commonSetup(final FMLCommonSetupEvent event) {
         // Some common setup code
         LOGGER.info("-- COMMON SETUP --");
+    }
+
+    private void registerItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> ace) {
+        GCItems.capabilities(ace);
     }
 
     // Add the example block item to the building blocks tab

@@ -14,7 +14,6 @@ import at.petrak.hexcasting.api.casting.mishaps.Mishap;
 import at.petrak.hexcasting.api.misc.MediaConstants;
 import at.petrak.hexcasting.api.pigment.FrozenPigment;
 import eu.seahousen.gregcasting.machine.MediaDisplacedWEMM;
-import eu.seahousen.gregcasting.mixinutil.IGetDebugData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

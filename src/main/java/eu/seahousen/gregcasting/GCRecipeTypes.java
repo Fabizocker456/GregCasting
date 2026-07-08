@@ -18,7 +18,7 @@ public class GCRecipeTypes {
                 .setEUIO(IO.IN)
                 .setMaxIOSize(2, 2, 2, 2)
                 .UI(builder -> builder
-                        .setProgressBar(GTGuiTextures.PROGRESS_PACKER)
+                        .setProgressBar(GTGuiTextures.PROGRESS_MAGNET)
                 )
                 .setSound(GTSoundEntries.BOILER);
     }

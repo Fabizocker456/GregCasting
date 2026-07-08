@@ -3,13 +3,12 @@ package eu.seahousen.gregcasting.mixin;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import eu.seahousen.gregcasting.mixinutil.IGetDebugData;
+import eu.seahousen.gregcasting.nixim.IGetDebugData;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.List;
 import java.util.Map;
 
 @Mixin(RecipeLogic.class)

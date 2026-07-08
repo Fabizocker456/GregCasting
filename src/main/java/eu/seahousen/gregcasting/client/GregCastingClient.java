@@ -2,6 +2,7 @@ package eu.seahousen.gregcasting.client;
 
 import eu.seahousen.gregcasting.GregCasting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
